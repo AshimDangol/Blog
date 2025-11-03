@@ -99,11 +99,11 @@ const connectDB = async () => {
     process.on("SIGTERM", () => shutdown("SIGTERM"));
     process.on("SIGINT", () => shutdown("SIGINT"));
 
-    // Optional: Internal keep-alive mechanism (pings itself every 10 minutes)
-    // Note: On Render's free tier, external ping services are more reliable
-    // This helps maintain 30+ day uptime by preventing the 15-minute inactivity timeout
+    // Internal keep-alive mechanism for infinite uptime
+    // Pings every 5 minutes to prevent Render's 15-minute inactivity timeout
+    // This achieves infinite/continuous uptime as long as pings continue
     if (process.env.ENABLE_KEEP_ALIVE === "true") {
-      const keepAliveInterval = 10 * 60 * 1000; // 10 minutes (less than Render's 15-min timeout)
+      const keepAliveInterval = 5 * 60 * 1000; // 5 minutes (aggressive ping to prevent any timeout)
       const keepAliveUrl = process.env.RENDER_EXTERNAL_URL || `http://localhost:${PORT}`;
       
       setInterval(async () => {
@@ -134,7 +134,7 @@ const connectDB = async () => {
         }
       }, keepAliveInterval);
       
-      console.log("🔄 Keep-alive mechanism enabled (pinging every 10 minutes to maintain 30+ day uptime)");
+      console.log("🔄 Keep-alive mechanism enabled (pinging every 5 minutes for infinite/continuous uptime)");
     }
   } catch (error) {
     console.error("❌ MongoDB Connection Error:", error.message);
