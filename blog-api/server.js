@@ -52,6 +52,23 @@ const connectDB = async () => {
       console.log(`🚀 Server running on port ${PORT}`);
     });
 
+    // Handle server listen errors (e.g., port already in use)
+    server.on("error", (error) => {
+      if (error.code === "EADDRINUSE") {
+        console.error(`❌ Port ${PORT} is already in use.`);
+        console.error(`   Try one of these solutions:`);
+        console.error(`   1. Kill the process using port ${PORT}:`);
+        console.error(`      Windows: netstat -ano | findstr :${PORT}`);
+        console.error(`      Then: taskkill /PID <PID> /F`);
+        console.error(`   2. Use a different port by setting PORT environment variable`);
+        console.error(`      Example: $env:PORT=5001; npm start`);
+        process.exit(1);
+      } else {
+        console.error("❌ Server Error:", error.message);
+        process.exit(1);
+      }
+    });
+
     // Graceful shutdown
     const shutdown = async (signal) => {
       console.log(`\n${signal} received. Shutting down gracefully...`);
